@@ -513,9 +513,14 @@ function subscribeRealtime(){
   channel=sb.channel('trip-'+tripId)
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'trips',filter:`id=eq.${tripId}`},payload=>{
       if(!document.activeElement?.matches('input,select,textarea')){
-        state={name:payload.new.name,days:payload.new.days};
-        billState=payload.new.bill||{members:[],expenses:[]};
-        render();renderBill();showToast('行程已更新 ✨');
+        // 只比较行程内容，忽略 open 状态变化，避免频繁闪烁
+        const remoteItems=JSON.stringify(payload.new.days.map(d=>({id:d.id,date:d.date,summary:d.summary,items:d.items})));
+        const localItems=JSON.stringify(state.days.map(d=>({id:d.id,date:d.date,summary:d.summary,items:d.items})));
+        if(remoteItems!==localItems){
+          state={name:payload.new.name,days:payload.new.days};
+          billState=payload.new.bill||{members:[],expenses:[]};
+          render();renderBill();showToast('行程已更新 ✨');
+        }
       }
     })
     .subscribe(s=>{
@@ -559,17 +564,8 @@ function renderNav(){
 }
 
 function navJump(di){
-  // 直接操作 DOM，不重新 render
-  state.days.forEach((d,i)=>{
-    d.open=(i===di);
-    const card=document.getElementById('day-'+i);
-    if(card) card.classList.toggle('open', i===di);
-  });
-  scheduleSave();
-  setTimeout(()=>{
-    const el=document.getElementById('day-'+di);
-    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
-  },30);
+  const el=document.getElementById('day-'+di);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function updateNavActive(){
