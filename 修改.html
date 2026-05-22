@@ -235,11 +235,12 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans SC',sans-se
   margin-top:3px;
 }
 .day-nav-item.active .day-nav-dot{background:var(--gold)}
-/* tooltip on hover */
+/* tooltip：改到左侧弹出 */
 .day-nav-item::after{
   content:attr(data-label);
   position:absolute;
-  left:calc(100% + 8px);
+  right:calc(100% + 8px);
+  left:auto;
   top:50%;transform:translateY(-50%);
   background:var(--ink);color:var(--paper);
   font-size:11px;
@@ -558,26 +559,64 @@ function renderNav(){
 }
 
 function navJump(di){
-  // 先展开那一天
-  if(!state.days[di].open){
-    state.days[di].open=true;
-    render();
-    scheduleSave();
-  }
+  autoScrolling=true;
+  // 展开目标天，收起其他天
+  state.days.forEach((d,i)=>{ d.open=(i===di); });
+  render();
+  scheduleSave();
   setTimeout(()=>{
     const el=document.getElementById('day-'+di);
     if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+    // 跳转完成后 1.5s 再恢复自动展开收起
+    setTimeout(()=>{ autoScrolling=false; },1500);
   },50);
 }
 
 function updateNavActive(){
-  const items=document.querySelectorAll('.day-nav-item');
-  items.forEach(item=>{
+  const navItems=document.querySelectorAll('.day-nav-item');
+  navItems.forEach(item=>{
     const di=parseInt(item.dataset.di);
     const el=document.getElementById('day-'+di);
     if(!el)return;
     const rect=el.getBoundingClientRect();
     item.classList.toggle('active', rect.top<=120&&rect.bottom>120);
+  });
+}
+
+// 滚动自动展开/收起：用 IntersectionObserver 监听每天的卡片
+let scrollObserver=null;
+let autoScrolling=false; // 点击跳转时暂停自动展开收起，避免抖动
+
+function setupScrollObserver(){
+  if(scrollObserver) scrollObserver.disconnect();
+  scrollObserver=new IntersectionObserver((entries)=>{
+    if(autoScrolling) return;
+    let changed=false;
+    entries.forEach(entry=>{
+      const di=parseInt(entry.target.dataset.di);
+      if(isNaN(di)) return;
+      const shouldOpen=entry.isIntersecting;
+      if(state.days[di].open!==shouldOpen){
+        state.days[di].open=shouldOpen;
+        changed=true;
+      }
+    });
+    if(changed){
+      // 只更新 DOM，不触发保存（避免频繁写库）
+      state.days.forEach((day,di)=>{
+        const card=document.getElementById('day-'+di);
+        if(card) card.classList.toggle('open', day.open);
+      });
+      updateNavActive();
+    }
+  },{
+    threshold:0.15,       // 露出 15% 就展开
+    rootMargin:'-60px 0px -30% 0px'  // 顶部留出 tab bar 高度
+  });
+
+  // 观察所有 day-card
+  document.querySelectorAll('.day-card[data-di]').forEach(el=>{
+    scrollObserver.observe(el);
   });
 }
 
@@ -589,6 +628,8 @@ function render(){
   c.innerHTML=state.days.map((day,di)=>renderDay(day,di)).join('');
   updateDaySelector();
   renderNav();
+  // 每次渲染后重新建立 observer
+  setTimeout(setupScrollObserver, 100);
 }
 
 function renderDay(day,di){
@@ -674,7 +715,7 @@ function renderDay(day,di){
   :`<button class="add-row" onclick="showForm(${di})">＋ 添加行程项</button>`;
 
   return `
-    <div class="day-card ${day.open?'open':''}" id="day-${di}">
+    <div class="day-card ${day.open?'open':''}" id="day-${di}" data-di="${di}">
       <div class="day-head" onclick="toggleDay(${di})">
         <div class="day-badge"><span class="lbl">DAY</span><span class="num">${di+1}</span></div>
         <div class="day-info">
