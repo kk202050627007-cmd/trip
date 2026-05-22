@@ -64,6 +64,18 @@ body{background:var(--paper);color:var(--ink);font-family:'Noto Sans SC',sans-se
 .meta-edit input{background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:9px 12px;font-size:12px;font-family:'Noto Sans SC',sans-serif;color:var(--ink);width:100%;outline:none}
 .meta-edit input:focus{border-color:var(--gold)}
 
+/* ── TRANSIT LINE ── */
+.transit-line{display:flex;align-items:center;gap:0;padding:0 6px;margin:2px 0;position:relative}
+.transit-line-left{display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0}
+.transit-line-dot{width:8px;height:8px;border-radius:50%;background:var(--paper3);flex-shrink:0}
+.transit-line-bar{width:2px;flex:1;min-height:28px;background:linear-gradient(to bottom,var(--paper3),var(--paper3));position:relative}
+.transit-line-bar::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:6px;border-top:2px solid var(--paper3);border-right:2px solid var(--paper3);transform:translate(-50%,-70%) rotate(135deg)}
+.transit-line-info{flex:1;min-width:0;padding:4px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.transit-line-text{font-size:11px;color:var(--ink3);line-height:1.4;flex:1}
+.transit-line-time{font-size:11px;color:var(--ink3);white-space:nowrap;background:var(--paper2);padding:2px 8px;border-radius:10px;flex-shrink:0}
+.transit-line-actions{display:flex;gap:2px;flex-shrink:0}
+.transit-line-actions .item-btn{width:22px;height:22px;font-size:12px}
+
 /* ── ITEM ROW ── */
 .item-row{display:flex;gap:10px;padding:10px 6px;border-radius:8px;align-items:flex-start;position:relative}
 .item-row:hover{background:var(--paper2)}
@@ -465,8 +477,35 @@ function renderDay(day,di){
 
   const items=day.items.map((it,ii)=>{
     const isSub=it.type==='sub';
+    const isTransitLine=it.type==='transit'||it.type==='plane';
     const isEditing=editingId===it.id;
     if(isEditing) return renderEditForm(di,ii,it);
+
+    // 交通/航班：渲染为连接线
+    if(isTransitLine){
+      const icon=it.type==='plane'?'✈':'🚗';
+      const durText=it.duration?fmtMin(it.duration):'';
+      const noteText=it.note?` · ${it.note}`:'';
+      return `
+        <div class="transit-line" id="item-${it.id}">
+          <div class="transit-line-left">
+            <div class="transit-line-dot"></div>
+            <div class="transit-line-bar"></div>
+            <div class="transit-line-dot"></div>
+          </div>
+          <div class="transit-line-info">
+            <div class="transit-line-text">${icon} ${esc(it.name)}${esc(noteText)}</div>
+            ${durText?`<div class="transit-line-time">${durText}</div>`:''}
+          </div>
+          <div class="transit-line-actions">
+            <button class="item-btn" onclick="moveItem(${di},${ii},-1)" ${ii===0?'style="opacity:.25;pointer-events:none"':''}>↑</button>
+            <button class="item-btn" onclick="moveItem(${di},${ii},1)" ${ii===day.items.length-1?'style="opacity:.25;pointer-events:none"':''}>↓</button>
+            <button class="item-btn" onclick="startEdit('${it.id}')">✏️</button>
+            <button class="item-btn del" onclick="delItem(${di},${ii})">×</button>
+          </div>
+        </div>`;
+    }
+
     return `
       <div class="item-row${isSub?' sub':''}" id="item-${it.id}">
         <div class="item-icon ${ICON_CLASS[it.type]||'ic-sight'}">${ICONS[it.type]||'📍'}</div>
@@ -477,8 +516,6 @@ function renderDay(day,di){
           </div>
           <div class="item-meta">
             <span>⏱ ${fmtMin(it.duration)}</span>
-            ${it.type==='transit'?'<span class="tag tag-transit">路程</span>':''}
-            ${it.type==='plane'?'<span class="tag tag-plane">航班</span>':''}
             ${it.type==='hotel'?'<span class="tag tag-hotel">住宿</span>':''}
             ${isSub?'<span class="tag tag-sub">小景点</span>':''}
           </div>
