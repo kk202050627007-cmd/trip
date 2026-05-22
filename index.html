@@ -394,25 +394,23 @@ function setSyncStatus(s,t){
 // ── 初始化 ────────────────────────────────────────────────
 async function init(){
   try{
+    // 优先从 URL hash 读取 tripId，否则用固定 ID
     const hash=location.hash.slice(1);
-    let targetId=hash.startsWith('trip-')?hash.replace('trip-',''):null;
-    if(targetId){
-      const{data}=await sb.from('trips').select('*').eq('id',targetId).single();
-      if(data){tripId=data.id;state={name:data.name,days:data.days};billState=data.bill||{members:[],expenses:[]}}
-      else targetId=null;
-    }
-    if(!targetId){
-      const{data}=await sb.from('trips').select('*').order('created_at',{ascending:true}).limit(1);
-      if(data&&data.length>0){
-        tripId=data[0].id;state={name:data[0].name,days:data[0].days};
-        billState=data[0].bill||{members:[],expenses:[]};
-      } else {
-        const{data:ins}=await sb.from('trips').insert({
-          name:'东欧 10 日游 · 深圳-维也纳-布达佩斯-布拉格-维也纳',
-          days:SEED_DAYS,bill:{members:[],expenses:[]}
-        }).select().single();
-        tripId=ins.id;state={name:ins.name,days:ins.days};billState={members:[],expenses:[]};
-      }
+    const FIXED_ID='86ca888c-d6a8-4790-956a-ce63ac58621f';
+    let targetId=hash.startsWith('trip-')?hash.replace('trip-',''):FIXED_ID;
+
+    const{data,error}=await sb.from('trips').select('*').eq('id',targetId).single();
+    if(data){
+      tripId=data.id;
+      state={name:data.name,days:data.days};
+      billState=data.bill||{members:[],expenses:[]};
+    } else {
+      // 找不到就新建
+      const{data:ins}=await sb.from('trips').insert({
+        name:'东欧 10 日游 · 深圳-维也纳-布达佩斯-布拉格-维也纳',
+        days:SEED_DAYS,bill:{members:[],expenses:[]}
+      }).select().single();
+      tripId=ins.id;state={name:ins.name,days:ins.days};billState={members:[],expenses:[]};
     }
     location.hash='trip-'+tripId;
     subscribeRealtime();
