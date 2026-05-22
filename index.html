@@ -486,6 +486,8 @@ function renderDay(day,di){
           ${it.note?`<div class="item-note">${esc(it.note)}</div>`:''}
         </div>
         <div class="item-actions">
+          <button class="item-btn" onclick="moveItem(${di},${ii},-1)" title="上移" ${ii===0?'style="opacity:.25;pointer-events:none"':''}>↑</button>
+          <button class="item-btn" onclick="moveItem(${di},${ii},1)" title="下移" ${ii===day.items.length-1?'style="opacity:.25;pointer-events:none"':''}>↓</button>
           <button class="item-btn" onclick="startEdit('${it.id}')" title="编辑">✏️</button>
           <button class="item-btn del" onclick="delItem(${di},${ii})" title="删除">×</button>
         </div>
@@ -536,6 +538,7 @@ function renderDay(day,di){
         </div>
         ${items}
         ${formHtml}
+        <button class="add-row" style="margin-top:6px;font-size:12px" onclick="autoSort(${di})">⏱ 按时间自动排序</button>
         <button class="del-day-btn" onclick="delDay(${di})">🗑 删除这一天</button>
       </div>
     </div>`;
@@ -590,6 +593,26 @@ function saveEdit(di,ii,itemId){
     note:document.getElementById('et-note-'+itemId)?.value.trim()||'',
   };
   editingId=null;render();scheduleSave();showToast('已保存 ✓');
+}
+
+// 上移 / 下移
+function moveItem(di,ii,dir){
+  const items=state.days[di].items;
+  const target=ii+dir;
+  if(target<0||target>=items.length)return;
+  [items[ii],items[target]]=[items[target],items[ii]];
+  render();scheduleSave();
+}
+
+// 自动按时间排序（无时间的排到最后，保持原顺序）
+function autoSort(di){
+  function toMin(t){
+    if(!t||!t.trim())return 9999;
+    const m=t.trim().match(/^(\d{1,2}):(\d{2})$/);
+    return m?parseInt(m[1])*60+parseInt(m[2]):9999;
+  }
+  state.days[di].items.sort((a,b)=>toMin(a.time)-toMin(b.time));
+  render();scheduleSave();showToast('已按时间排序 ✓');
 }
 
 function delItem(di,ii){
