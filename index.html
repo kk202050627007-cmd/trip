@@ -444,9 +444,10 @@ function scheduleSave(){
     setSyncStatus('saving','保存中...');
     try{
       const days=state.days.map(d=>({id:d.id,date:d.date,summary:d.summary,open:d.open,items:d.items}));
-      await sb.from('trips').update({name:state.name,days,bill:billState,updated_at:new Date().toISOString()}).eq('id',tripId);
+      const {error:saveErr}=await sb.from('trips').update({name:state.name,days,bill:billState,updated_at:new Date().toISOString()}).eq('id',tripId);
+      if(saveErr){console.error('保存错误:',saveErr);setSyncStatus('error','❌ '+saveErr.message);showToast('❌ '+saveErr.message);return;}
       setSyncStatus('live','已保存 · 实时同步');
-    }catch(e){setSyncStatus('error','保存失败')}
+    }catch(e){console.error('保存异常:',e);setSyncStatus('error','保存失败: '+e.message);showToast('❌ 保存失败: '+e.message);}
   },800);
 }
 
