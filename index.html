@@ -4,358 +4,189 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>东欧 10 日游 · 旅行规划</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --ink: #1a1209;
-  --ink2: #4a3f2f;
-  --ink3: #8a7a65;
-  --paper: #faf7f2;
-  --paper2: #f2ede4;
-  --paper3: #e8e0d2;
-  --gold: #b5832a;
-  --gold2: #d4a843;
-  --green: #2d6a4f;
-  --green2: #52b788;
-  --red: #9b2226;
-  --blue: #1d3a6e;
-  --purple: #4a2c6e;
-  --r: 14px;
-  --shadow: 0 2px 16px rgba(26,18,9,.08), 0 1px 4px rgba(26,18,9,.06);
+  --ink:#1a1209; --ink2:#4a3f2f; --ink3:#8a7a65;
+  --paper:#faf7f2; --paper2:#f2ede4; --paper3:#e8e0d2;
+  --gold:#b5832a; --gold2:#d4a843;
+  --green:#2d6a4f; --green2:#52b788;
+  --red:#9b2226; --blue:#1d3a6e; --purple:#4a2c6e;
+  --r:14px; --shadow:0 2px 16px rgba(26,18,9,.08),0 1px 4px rgba(26,18,9,.06);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: 'Noto Sans SC', sans-serif;
-  font-weight: 400;
-  min-height: 100vh;
-  padding-bottom: 60px;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--paper);color:var(--ink);font-family:'Noto Sans SC',sans-serif;min-height:100vh;padding-bottom:80px}
+
+/* ── TABS ── */
+.tab-bar{display:flex;background:#fff;border-bottom:1px solid var(--paper3);position:sticky;top:0;z-index:100}
+.tab{flex:1;padding:14px 0;text-align:center;font-size:14px;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:500}
 
 /* ── HEADER ── */
-.app-header {
-  background: var(--ink);
-  color: var(--paper);
-  padding: 52px 20px 28px;
-  position: relative;
-  overflow: hidden;
-}
-.app-header::before {
-  content: '';
-  position: absolute;
-  top: -60px; right: -40px;
-  width: 220px; height: 220px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(181,131,42,.25) 0%, transparent 70%);
-  pointer-events: none;
-}
-.header-eyebrow {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: var(--gold2);
-  margin-bottom: 8px;
-}
-.header-title {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.3;
-  margin-bottom: 6px;
-}
-.header-sub {
-  font-size: 12px;
-  color: rgba(250,247,242,.5);
-  font-weight: 300;
-  margin-bottom: 16px;
-}
-.sync-bar {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  background: rgba(255,255,255,.1);
-  color: rgba(250,247,242,.7);
-  margin-bottom: 16px;
-}
-.sync-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: #aaa;
-  flex-shrink: 0;
-  transition: background .3s;
-}
-.sync-dot.live  { background: var(--green2); box-shadow: 0 0 6px var(--green2); }
-.sync-dot.saving { background: var(--gold2); }
-.sync-dot.error  { background: var(--red); }
-
-.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.btn-share {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--gold); color: #fff;
-  border: none; border-radius: 8px;
-  padding: 10px 18px; font-size: 13px;
-  font-family: 'Noto Sans SC', sans-serif;
-  cursor: pointer; font-weight: 500;
-  transition: background .2s;
-}
-.btn-share:hover { background: var(--gold2); }
-.btn-addday {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,.12); color: var(--paper);
-  border: 1px solid rgba(255,255,255,.2); border-radius: 8px;
-  padding: 10px 18px; font-size: 13px;
-  font-family: 'Noto Sans SC', sans-serif;
-  cursor: pointer; font-weight: 400;
-  transition: background .2s;
-}
-.btn-addday:hover { background: rgba(255,255,255,.2); }
-
-/* ── COLLAB BADGE ── */
-.collab-bar {
-  background: #fff;
-  border-bottom: 1px solid var(--paper3);
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--ink3);
-}
-.collab-avatars { display: flex; gap: -4px; }
-.collab-avatar {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: var(--ink);
-  color: var(--gold2);
-  font-size: 11px;
-  font-weight: 600;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid #fff;
-  margin-right: -6px;
-}
-.collab-text { margin-left: 10px; }
+.app-header{background:var(--ink);color:var(--paper);padding:44px 20px 24px;position:relative;overflow:hidden}
+.app-header::before{content:'';position:absolute;top:-60px;right:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(181,131,42,.25) 0%,transparent 70%);pointer-events:none}
+.header-eyebrow{font-size:11px;letter-spacing:3px;color:var(--gold2);margin-bottom:8px}
+.header-title{font-family:'Noto Serif SC',serif;font-size:24px;font-weight:700;line-height:1.3;margin-bottom:6px}
+.header-sub{font-size:12px;color:rgba(250,247,242,.5);margin-bottom:14px}
+.sync-bar{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.1);color:rgba(250,247,242,.7);margin-bottom:14px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#aaa;flex-shrink:0;transition:background .3s}
+.sync-dot.live{background:var(--green2);box-shadow:0 0 6px var(--green2)}
+.sync-dot.saving{background:var(--gold2)}
+.sync-dot.error{background:var(--red)}
+.header-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn-share{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-family:'Noto Sans SC',sans-serif;cursor:pointer;font-weight:500}
+.btn-addday{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);color:var(--paper);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px 18px;font-size:13px;font-family:'Noto Sans SC',sans-serif;cursor:pointer}
 
 /* ── MAIN ── */
-.main { padding: 16px 16px 0; }
+.main{padding:16px 16px 0}
+.page{display:none}
+.page.active{display:block}
 
 /* ── DAY CARD ── */
-.day-card {
-  background: #fff;
-  border-radius: var(--r);
-  margin-bottom: 14px;
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  border: 1px solid var(--paper3);
-  transition: box-shadow .2s;
-}
-.day-card.open { box-shadow: 0 4px 24px rgba(26,18,9,.11), 0 1px 4px rgba(26,18,9,.06); }
-.day-head {
-  display: flex; align-items: center; gap: 14px;
-  padding: 16px 16px 16px 14px;
-  cursor: pointer; user-select: none;
-}
-.day-badge {
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: var(--ink);
-  color: var(--gold2);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  flex-shrink: 0; line-height: 1;
-}
-.day-badge .lbl { font-size: 9px; color: rgba(250,247,242,.4); letter-spacing: 1px; }
-.day-badge .num { font-size: 18px; font-weight: 600; font-family: 'Noto Serif SC', serif; }
-.day-info { flex: 1; min-width: 0; }
-.day-title { font-size: 15px; font-weight: 500; color: var(--ink); line-height: 1.35; margin-bottom: 3px; }
-.day-summary { font-size: 12px; color: var(--ink3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
-.day-chips { display: flex; gap: 8px; }
-.chip { font-size: 11px; color: var(--ink3); display: inline-flex; align-items: center; gap: 3px; }
-.chev { font-size: 18px; color: var(--paper3); flex-shrink: 0; transition: transform .22s ease; }
-.day-card.open .chev { transform: rotate(180deg); }
+.day-card{background:#fff;border-radius:var(--r);margin-bottom:14px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--paper3)}
+.day-card.open{box-shadow:0 4px 24px rgba(26,18,9,.11),0 1px 4px rgba(26,18,9,.06)}
+.day-head{display:flex;align-items:center;gap:14px;padding:16px 16px 16px 14px;cursor:pointer;user-select:none}
+.day-badge{width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--gold2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.day-badge .lbl{font-size:9px;color:rgba(250,247,242,.4);letter-spacing:1px}
+.day-badge .num{font-size:18px;font-weight:600;font-family:'Noto Serif SC',serif}
+.day-info{flex:1;min-width:0}
+.day-title{font-size:15px;font-weight:500;color:var(--ink);line-height:1.35;margin-bottom:3px}
+.day-summary{font-size:12px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.day-chips{display:flex;gap:8px}
+.chip{font-size:11px;color:var(--ink3)}
+.chev{font-size:18px;color:var(--paper3);flex-shrink:0;transition:transform .22s ease}
+.day-card.open .chev{transform:rotate(180deg)}
+.day-body{display:none;border-top:1px solid var(--paper2);padding:14px 14px 16px}
+.day-card.open .day-body{display:block}
+.meta-edit{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.meta-edit input{background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:9px 12px;font-size:12px;font-family:'Noto Sans SC',sans-serif;color:var(--ink);width:100%;outline:none}
+.meta-edit input:focus{border-color:var(--gold)}
 
-.day-body { display: none; border-top: 1px solid var(--paper2); padding: 14px 14px 16px; }
-.day-card.open .day-body { display: block; }
+/* ── ITEM ROW ── */
+.item-row{display:flex;gap:10px;padding:10px 6px;border-radius:8px;align-items:flex-start;position:relative}
+.item-row:hover{background:var(--paper2)}
+.item-row.sub{margin-left:24px;border-left:2px solid var(--paper3);padding-left:12px;border-radius:0 8px 8px 0}
+.item-row.sub .item-icon{width:28px;height:28px;font-size:13px}
+.item-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:1px}
+.ic-sight{background:#e8f5ee} .ic-sub{background:#f0f0f0}
+.ic-food{background:#fef3e2} .ic-transit{background:#ece8fd}
+.ic-hotel{background:#fde8f0} .ic-plane{background:#e2eefa}
+.item-main{flex:1;min-width:0}
+.item-name{font-size:14px;font-weight:500;color:var(--ink);line-height:1.4}
+.item-row.sub .item-name{font-size:13px;font-weight:400;color:var(--ink2)}
+.item-time-tag{display:inline-block;background:var(--paper2);color:var(--ink3);font-size:11px;padding:1px 8px;border-radius:5px;margin-right:6px;vertical-align:middle}
+.item-meta{font-size:11px;color:var(--ink3);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}
+.tag{display:inline-block;padding:1px 8px;border-radius:5px;font-size:10px}
+.tag-transit{background:#ece8fd;color:var(--purple)}
+.tag-plane{background:#e2eefa;color:var(--blue)}
+.tag-hotel{background:#fde8f0;color:var(--red)}
+.tag-sub{background:#f0f0f0;color:#666}
+.item-note{font-size:12px;color:var(--ink3);margin-top:5px;line-height:1.6}
+.item-actions{display:flex;gap:2px;flex-shrink:0}
+.item-btn{width:28px;height:28px;border:none;background:none;color:var(--paper3);font-size:15px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .15s,background .15s}
+.item-btn:hover{color:var(--ink2);background:var(--paper2)}
+.item-btn.del:hover{color:var(--red);background:#fde8f0}
 
-.meta-edit { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-.meta-edit input {
-  background: var(--paper2); border: 1px solid var(--paper3);
-  border-radius: 8px; padding: 9px 12px;
-  font-size: 12px; font-family: 'Noto Sans SC', sans-serif;
-  color: var(--ink); width: 100%; outline: none;
-}
-.meta-edit input:focus { border-color: var(--gold); }
+/* ── EDIT FORM (inline) ── */
+.item-edit-form{background:var(--paper2);border-radius:10px;padding:14px;margin:6px 0;border:1px solid var(--paper3)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.form-field.full{grid-column:1/-1}
+.form-label{font-size:11px;color:var(--ink3)}
+.form-field input,.form-field select,.form-field textarea{background:#fff;border:1px solid var(--paper3);border-radius:7px;padding:9px 10px;font-size:13px;font-family:'Noto Sans SC',sans-serif;color:var(--ink);outline:none;width:100%}
+.form-field input:focus,.form-field select:focus{border-color:var(--gold)}
+.form-field textarea{resize:vertical;min-height:60px}
+.form-btns{display:flex;gap:8px;margin-top:12px}
+.form-btns button{flex:1;padding:10px;border-radius:8px;border:none;font-size:13px;font-family:'Noto Sans SC',sans-serif;cursor:pointer;font-weight:500}
+.btn-save-item{background:var(--green);color:#fff}
+.btn-cancel-item{background:var(--paper3);color:var(--ink2)}
 
-/* ── ITEMS ── */
-.item-row {
-  display: flex; gap: 10px; padding: 10px 6px;
-  border-radius: 8px; transition: background .15s; align-items: flex-start;
-}
-.item-row:hover { background: var(--paper2); }
-.item-icon {
-  width: 36px; height: 36px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0; margin-top: 1px;
-}
-.ic-sight   { background: #e8f5ee; }
-.ic-food    { background: #fef3e2; }
-.ic-transit { background: #ece8fd; }
-.ic-hotel   { background: #fde8f0; }
-.ic-plane   { background: #e2eefa; }
-
-.item-main { flex: 1; min-width: 0; }
-.item-name { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.4; }
-.item-time-tag {
-  display: inline-block; background: var(--paper2); color: var(--ink3);
-  font-size: 11px; padding: 1px 8px; border-radius: 5px;
-  margin-right: 6px; vertical-align: middle;
-}
-.item-meta { font-size: 11px; color: var(--ink3); margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
-.tag { display: inline-block; padding: 1px 8px; border-radius: 5px; font-size: 10px; }
-.tag-transit { background: #ece8fd; color: var(--purple); }
-.tag-plane   { background: #e2eefa; color: var(--blue); }
-.tag-hotel   { background: #fde8f0; color: var(--red); }
-.item-note { font-size: 12px; color: var(--ink3); margin-top: 5px; line-height: 1.6; }
-.item-del {
-  width: 30px; height: 30px; border: none; background: none;
-  color: var(--paper3); font-size: 18px; cursor: pointer;
-  flex-shrink: 0; border-radius: 6px;
-  transition: color .15s, background .15s;
-  display: flex; align-items: center; justify-content: center;
-}
-.item-del:hover { color: var(--red); background: #fde8f0; }
-
-/* ── FORM ── */
-.add-row {
-  margin-top: 8px; width: 100%; background: none;
-  border: 1.5px dashed var(--paper3); border-radius: 8px;
-  padding: 10px; color: var(--ink3); font-size: 13px;
-  cursor: pointer; text-align: center;
-  font-family: 'Noto Sans SC', sans-serif;
-  transition: border-color .15s, color .15s;
-}
-.add-row:hover { border-color: var(--gold); color: var(--gold); }
-
-.add-form {
-  margin-top: 10px; background: var(--paper2);
-  border-radius: 10px; padding: 14px; border: 1px solid var(--paper3);
-}
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.form-field { display: flex; flex-direction: column; gap: 4px; }
-.form-field.full { grid-column: 1/-1; }
-.form-label { font-size: 11px; color: var(--ink3); }
-.form-field input, .form-field select {
-  background: #fff; border: 1px solid var(--paper3);
-  border-radius: 7px; padding: 9px 10px; font-size: 13px;
-  font-family: 'Noto Sans SC', sans-serif; color: var(--ink); outline: none; width: 100%;
-}
-.form-field input:focus, .form-field select:focus { border-color: var(--gold); }
-.form-btns { display: flex; gap: 8px; margin-top: 12px; }
-.form-btns button {
-  flex: 1; padding: 10px; border-radius: 8px; border: none;
-  font-size: 13px; font-family: 'Noto Sans SC', sans-serif;
-  cursor: pointer; font-weight: 500;
-}
-.btn-save-item { background: var(--green); color: #fff; }
-.btn-cancel-item { background: var(--paper3); color: var(--ink2); }
-
-.del-day-btn {
-  margin-top: 12px; width: 100%; background: none;
-  border: 1px solid #fde8f0; border-radius: 8px;
-  padding: 9px; color: var(--red); font-size: 12px;
-  cursor: pointer; font-family: 'Noto Sans SC', sans-serif;
-  transition: background .15s;
-}
-.del-day-btn:hover { background: #fde8f0; }
+/* ── ADD BUTTONS ── */
+.add-row{margin-top:8px;width:100%;background:none;border:1.5px dashed var(--paper3);border-radius:8px;padding:10px;color:var(--ink3);font-size:13px;cursor:pointer;text-align:center;font-family:'Noto Sans SC',sans-serif;transition:border-color .15s,color .15s}
+.add-row:hover{border-color:var(--gold);color:var(--gold)}
+.add-row.sub-btn{margin-top:4px;border-style:dashed;border-color:var(--paper3);font-size:12px;padding:7px}
+.del-day-btn{margin-top:12px;width:100%;background:none;border:1px solid #fde8f0;border-radius:8px;padding:9px;color:var(--red);font-size:12px;cursor:pointer;font-family:'Noto Sans SC',sans-serif}
+.del-day-btn:hover{background:#fde8f0}
 
 /* ── SHARE MODAL ── */
-.share-modal {
-  display: none; position: fixed; inset: 0;
-  background: rgba(26,18,9,.55); z-index: 999;
-  align-items: flex-end;
-}
-.share-modal.show { display: flex; }
-.share-sheet {
-  background: var(--paper); border-radius: 20px 20px 0 0;
-  padding: 28px 20px 44px; width: 100%;
-  animation: slideUp .25s ease;
-}
-@keyframes slideUp { from { transform: translateY(60px); opacity: 0; } }
-.share-sheet h3 { font-family: 'Noto Serif SC', serif; font-size: 18px; margin-bottom: 8px; }
-.share-sheet p { font-size: 13px; color: var(--ink3); margin-bottom: 16px; line-height: 1.7; }
-.share-url {
-  background: var(--paper2); border-radius: 10px; padding: 14px;
-  font-size: 12px; color: var(--blue); word-break: break-all;
-  margin-bottom: 16px; line-height: 1.6; border: 1px solid var(--paper3);
-  font-weight: 500;
-}
-.share-btns { display: flex; gap: 10px; }
-.share-btns button {
-  flex: 1; padding: 12px; border-radius: 10px; border: none;
-  font-size: 14px; font-family: 'Noto Sans SC', sans-serif;
-  cursor: pointer; font-weight: 500;
-}
-.btn-copy { background: var(--ink); color: var(--paper); }
-.btn-close-modal { background: var(--paper2); color: var(--ink2); }
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(26,18,9,.55);z-index:999;align-items:flex-end}
+.modal-bg.show{display:flex}
+.modal-sheet{background:var(--paper);border-radius:20px 20px 0 0;padding:28px 20px 44px;width:100%;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(60px);opacity:0}}
+.modal-sheet h3{font-family:'Noto Serif SC',serif;font-size:18px;margin-bottom:8px}
+.modal-sheet p{font-size:13px;color:var(--ink3);margin-bottom:16px;line-height:1.7}
+.share-url{background:var(--paper2);border-radius:10px;padding:14px;font-size:12px;color:var(--blue);word-break:break-all;margin-bottom:16px;line-height:1.6;border:1px solid var(--paper3);font-weight:500}
+.modal-btns{display:flex;gap:10px}
+.modal-btns button{flex:1;padding:12px;border-radius:10px;border:none;font-size:14px;font-family:'Noto Sans SC',sans-serif;cursor:pointer;font-weight:500}
+.btn-copy{background:var(--ink);color:var(--paper)}
+.btn-close-modal{background:var(--paper2);color:var(--ink2)}
 
-/* ── LOADING ── */
-.loading-screen {
-  position: fixed; inset: 0; background: var(--ink);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; z-index: 9999;
-  gap: 16px; transition: opacity .4s;
-}
-.loading-screen.hide { opacity: 0; pointer-events: none; }
-.loading-title { font-family: 'Noto Serif SC', serif; font-size: 22px; color: var(--gold2); }
-.loading-sub { font-size: 13px; color: rgba(250,247,242,.4); }
-.spinner {
-  width: 36px; height: 36px; border-radius: 50%;
-  border: 3px solid rgba(181,131,42,.2);
-  border-top-color: var(--gold2);
-  animation: spin .8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ── BILL PAGE ── */
+.bill-section{background:#fff;border-radius:var(--r);margin-bottom:16px;padding:20px;box-shadow:var(--shadow);border:1px solid var(--paper3)}
+.bill-section h3{font-family:'Noto Serif SC',serif;font-size:16px;margin-bottom:14px;color:var(--ink)}
+.member-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.member-tag{display:inline-flex;align-items:center;gap:6px;background:var(--paper2);border-radius:20px;padding:6px 14px;font-size:13px}
+.member-tag .remove-member{color:var(--ink3);cursor:pointer;font-size:16px;line-height:1}
+.member-tag .remove-member:hover{color:var(--red)}
+.add-member-row{display:flex;gap:8px}
+.add-member-row input{flex:1;background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Noto Sans SC',sans-serif;color:var(--ink);outline:none}
+.add-member-row input:focus{border-color:var(--gold)}
+.add-member-row button{background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-family:'Noto Sans SC',sans-serif;cursor:pointer;white-space:nowrap}
 
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 80px; left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: var(--ink); color: var(--paper);
-  padding: 10px 22px; border-radius: 100px;
-  font-size: 13px; opacity: 0;
-  transition: opacity .2s, transform .2s;
-  pointer-events: none; white-space: nowrap; z-index: 1000;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.expense-list{margin-bottom:12px}
+.expense-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--paper2)}
+.expense-item:last-child{border-bottom:none}
+.expense-info{flex:1;min-width:0}
+.expense-payer{font-size:13px;font-weight:500;color:var(--ink)}
+.expense-desc{font-size:12px;color:var(--ink3);margin-top:2px}
+.expense-amount{font-size:15px;font-weight:600;color:var(--gold);flex-shrink:0}
+.expense-del{width:28px;height:28px;border:none;background:none;color:var(--paper3);font-size:15px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.expense-del:hover{color:var(--red);background:#fde8f0}
 
-@media (max-width: 400px) {
-  .meta-edit { grid-template-columns: 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
-  .form-field.full { grid-column: auto; }
-}
+.add-expense-form{background:var(--paper2);border-radius:10px;padding:14px;border:1px solid var(--paper3)}
+.add-expense-form select,.add-expense-form input{background:#fff;border:1px solid var(--paper3);border-radius:7px;padding:9px 10px;font-size:13px;font-family:'Noto Sans SC',sans-serif;color:var(--ink);outline:none;width:100%;margin-bottom:8px}
+.add-expense-form select:focus,.add-expense-form input:focus{border-color:var(--gold)}
+.add-expense-form button{width:100%;background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-family:'Noto Sans SC',sans-serif;cursor:pointer;font-weight:500}
+
+.settle-list{display:flex;flex-direction:column;gap:10px}
+.settle-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--paper2);border-radius:10px;font-size:13px}
+.settle-arrow{color:var(--ink3);margin:0 8px}
+.settle-amount{font-weight:600;color:var(--red)}
+.settle-empty{text-align:center;color:var(--ink3);font-size:13px;padding:20px 0}
+
+.day-selector{width:100%;background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Noto Sans SC',sans-serif;color:var(--ink);outline:none;margin-bottom:8px}
+.day-selector:focus{border-color:var(--gold)}
+
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--paper3);margin-top:8px;font-size:13px;color:var(--ink2)}
+.total-row strong{color:var(--gold);font-size:15px}
+
+/* ── LOADING / TOAST ── */
+.loading-screen{position:fixed;inset:0;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;transition:opacity .4s}
+.loading-screen.hide{opacity:0;pointer-events:none}
+.loading-title{font-family:'Noto Serif SC',serif;font-size:22px;color:var(--gold2)}
+.loading-sub{font-size:13px;color:rgba(250,247,242,.4)}
+.spinner{width:36px;height:36px;border-radius:50%;border:3px solid rgba(181,131,42,.2);border-top-color:var(--gold2);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:10px 22px;border-radius:100px;font-size:13px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;z-index:1000}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:400px){.meta-edit,.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}}
 </style>
 </head>
 <body>
 
-<!-- 加载屏 -->
 <div class="loading-screen" id="loading">
   <div class="spinner"></div>
   <div class="loading-title">东欧 10 日游</div>
   <div class="loading-sub">连接中...</div>
 </div>
 
-<!-- 主体 -->
 <div id="app" style="display:none">
   <div class="app-header">
     <div class="header-eyebrow">✈ TRAVEL PLANNER</div>
-    <div class="header-title" id="trip-title">东欧 10 日游</div>
+    <div class="header-title">东欧 10 日游</div>
     <div class="header-sub">与朋友实时共同编辑每日行程</div>
     <div class="sync-bar">
       <div class="sync-dot" id="sync-dot"></div>
@@ -367,21 +198,65 @@ body {
     </div>
   </div>
 
-  <div class="collab-bar" id="collab-bar">
-    <div class="collab-avatars" id="collab-avatars"></div>
-    <div class="collab-text" id="collab-text">加载中...</div>
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('trip')">🗺 行程</div>
+    <div class="tab" onclick="switchTab('bill')">💰 账单</div>
   </div>
 
-  <div class="main" id="days-container"></div>
+  <!-- 行程页 -->
+  <div class="page active" id="page-trip">
+    <div class="main" id="days-container"></div>
+  </div>
+
+  <!-- 账单页 -->
+  <div class="page" id="page-bill">
+    <div class="main" style="padding-top:16px">
+
+      <!-- 成员管理 -->
+      <div class="bill-section">
+        <h3>👥 团队成员</h3>
+        <div class="member-list" id="member-list"></div>
+        <div class="add-member-row">
+          <input id="new-member-input" placeholder="输入成员名字，如：小明" maxlength="10"
+            onkeydown="if(event.key==='Enter')addMember()" />
+          <button onclick="addMember()">添加</button>
+        </div>
+      </div>
+
+      <!-- 记账 -->
+      <div class="bill-section">
+        <h3>📝 记录支出</h3>
+        <div class="expense-list" id="expense-list"></div>
+        <div class="add-expense-form">
+          <select id="exp-payer"></select>
+          <input id="exp-desc" placeholder="项目描述，如：D3 游船票" />
+          <select id="exp-day" class="day-selector"></select>
+          <input id="exp-amount" type="number" placeholder="金额（元）" min="0" step="0.01" />
+          <button onclick="addExpense()">＋ 添加支出</button>
+        </div>
+        <div class="total-row">
+          <span>总支出</span>
+          <strong id="total-amount">¥0.00</strong>
+        </div>
+      </div>
+
+      <!-- 结算 -->
+      <div class="bill-section">
+        <h3>🧮 AA 结算</h3>
+        <div id="settle-result"></div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <!-- 分享弹窗 -->
-<div class="share-modal" id="share-modal" onclick="closeShareIfBg(event)">
-  <div class="share-sheet">
+<div class="modal-bg" id="share-modal" onclick="closeShareIfBg(event)">
+  <div class="modal-sheet">
     <h3>🔗 分享给朋友</h3>
-    <p>把下面的链接发给朋友，他们点开就能<strong>直接实时协作编辑</strong>，不需要注册任何账号。</p>
+    <p>把下面的链接发给朋友，打开即可实时协作编辑，无需注册。</p>
     <div class="share-url" id="share-url-text"></div>
-    <div class="share-btns">
+    <div class="modal-btns">
       <button class="btn-copy" onclick="copyUrl()">📋 复制链接</button>
       <button class="btn-close-modal" onclick="closeShare()">关闭</button>
     </div>
@@ -391,309 +266,253 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Supabase 配置 ──────────────────────────────────────────
 const SUPABASE_URL = 'https://hnosqoizitgkezujuwfu.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhub3Nxb2l6aXRna2V6dWp1d2Z1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzOTYwMTgsImV4cCI6MjA5NDk3MjAxOH0.CGK4cyHUUATfm4UfqQbj8CrkpoHflnDjh0ojXlB9Pwk';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── 常量 ───────────────────────────────────────────────────
-const ICONS      = { sight:'⛰️', food:'🍴', transit:'🚗', hotel:'🛏️', plane:'✈️' };
-const ICON_CLASS = { sight:'ic-sight', food:'ic-food', transit:'ic-transit', hotel:'ic-hotel', plane:'ic-plane' };
+const ICONS      = {sight:'⛰️',sub:'📍',food:'🍴',transit:'🚗',hotel:'🛏️',plane:'✈️'};
+const ICON_CLASS = {sight:'ic-sight',sub:'ic-sub',food:'ic-food',transit:'ic-transit',hotel:'ic-hotel',plane:'ic-plane'};
 const TYPE_OPTS  = [
-  {v:'sight',  l:'⛰️ 景点'},
-  {v:'food',   l:'🍴 餐饮'},
+  {v:'sight', l:'⛰️ 大景点'},
+  {v:'sub',   l:'📍 小景点'},
+  {v:'food',  l:'🍴 餐饮'},
   {v:'transit',l:'🚗 交通'},
-  {v:'hotel',  l:'🛏️ 住宿'},
-  {v:'plane',  l:'✈️ 航班'},
+  {v:'hotel', l:'🛏️ 住宿'},
+  {v:'plane', l:'✈️ 航班'},
 ];
+
 const SEED_DAYS = [
-  { id:'d1', date:'Day 1 · 深圳机场集合', summary:'23:00 集合 · HU789 飞维也纳', open:true, items:[
-    {id:'i1a',type:'plane',  name:'深圳机场集合',       time:'23:00',duration:180,note:'提前 3 小时到机场'},
-    {id:'i1b',type:'plane',  name:'HU789 深圳-维也纳', time:'01:55',duration:678,note:'飞行 11h18m，次日当地 06:13 抵达'},
+  {id:'d1',date:'Day 1 · 深圳机场集合',summary:'23:00 集合 · HU789 飞维也纳',open:true,items:[
+    {id:'i1a',type:'plane',name:'深圳机场集合',time:'23:00',duration:180,note:'提前 3 小时到机场'},
+    {id:'i1b',type:'plane',name:'HU789 深圳-维也纳',time:'01:55',duration:678,note:'飞行 11h18m，次日当地 06:13 抵达'},
   ]},
-  { id:'d2', date:'Day 2 · 维也纳-布达佩斯', summary:'环形大道 · 斯蒂芬大教堂 · 美泉宫', open:false, items:[
-    {id:'i2a',type:'transit',name:'维也纳环形大道巡游', time:'09:30',duration:60, note:'从城市公园出发，新皇宫、国立歌剧院、议会大楼'},
-    {id:'i2b',type:'sight',  name:'斯蒂芬大教堂',       time:'10:30',duration:150,note:'维也纳心脏，塔高 136.7m，约 2.5 小时'},
-    {id:'i2c',type:'food',   name:'享用午餐',            time:'12:30',duration:60, note:''},
-    {id:'i2d',type:'sight',  name:'美泉宫',              time:'13:30',duration:90, note:'含 24 宫门票 + 人工讲解，茜茜公主故居'},
-    {id:'i2e',type:'transit',name:'乘车前往布达佩斯',   time:'15:30',duration:180,note:'路程约 245 km'},
-    {id:'i2f',type:'food',   name:'享用晚餐',            time:'18:30',duration:60, note:''},
-    {id:'i2g',type:'hotel',  name:'入住温泉酒店',        time:'19:30',duration:0,  note:'请自备泳衣'},
+  {id:'d2',date:'Day 2 · 维也纳-布达佩斯',summary:'环形大道 · 斯蒂芬大教堂 · 美泉宫',open:false,items:[
+    {id:'i2a',type:'transit',name:'维也纳环形大道巡游',time:'09:30',duration:60,note:'从城市公园出发，新皇宫、国立歌剧院、议会大楼'},
+    {id:'i2b',type:'sight',name:'斯蒂芬大教堂',time:'10:30',duration:150,note:'维也纳心脏，塔高 136.7m，约 2.5 小时'},
+    {id:'i2c',type:'food',name:'享用午餐',time:'12:30',duration:60,note:''},
+    {id:'i2d',type:'sight',name:'美泉宫',time:'13:30',duration:90,note:'含 24 宫门票 + 人工讲解，茜茜公主故居'},
+    {id:'i2e',type:'transit',name:'乘车前往布达佩斯',time:'15:30',duration:180,note:'路程约 245 km'},
+    {id:'i2f',type:'food',name:'享用晚餐',time:'18:30',duration:60,note:''},
+    {id:'i2g',type:'hotel',name:'入住温泉酒店',time:'19:30',duration:0,note:'请自备泳衣'},
   ]},
-  { id:'d3', date:'Day 3 · 布达佩斯', summary:'渔人堡 · 英雄广场 · 多瑙河游船', open:false, items:[
-    {id:'i3a',type:'food',   name:'酒店早餐',              time:'08:00',duration:30, note:''},
-    {id:'i3b',type:'sight',  name:'渔人堡 & 马加什教堂',   time:'08:30',duration:180,note:'城堡区核心，匈牙利三大建筑之一'},
-    {id:'i3c',type:'food',   name:'享用午餐',              time:'11:30',duration:60, note:''},
-    {id:'i3d',type:'sight',  name:'英雄广场',              time:'13:00',duration:60, note:'路程 6 km，建国 1000 周年纪念'},
-    {id:'i3e',type:'sight',  name:'城市公园',              time:'14:30',duration:60, note:''},
-    {id:'i3f',type:'sight',  name:'自由活动 · 自由桥',     time:'15:30',duration:60, note:'漫步多瑙河畔'},
-    {id:'i3g',type:'sight',  name:'多瑙河游船',            time:'16:30',duration:60, note:'远眺国会大厦，约 60 分钟'},
-    {id:'i3h',type:'food',   name:'享用晚餐',              time:'18:00',duration:60, note:''},
-    {id:'i3i',type:'hotel',  name:'入住温泉酒店',          time:'19:00',duration:0,  note:'请自备泳衣'},
+  {id:'d3',date:'Day 3 · 布达佩斯',summary:'渔人堡 · 英雄广场 · 多瑙河游船',open:false,items:[
+    {id:'i3a',type:'food',name:'酒店早餐',time:'08:00',duration:30,note:''},
+    {id:'i3b',type:'sight',name:'渔人堡 & 马加什教堂',time:'08:30',duration:180,note:'城堡区核心，匈牙利三大建筑之一'},
+    {id:'i3c',type:'food',name:'享用午餐',time:'11:30',duration:60,note:''},
+    {id:'i3d',type:'sight',name:'英雄广场',time:'13:00',duration:60,note:'路程 6 km，建国 1000 周年纪念'},
+    {id:'i3e',type:'sight',name:'城市公园',time:'14:30',duration:60,note:''},
+    {id:'i3f',type:'sub',name:'自由桥打卡',time:'15:30',duration:30,note:'漫步多瑙河畔'},
+    {id:'i3g',type:'sight',name:'多瑙河游船',time:'16:30',duration:60,note:'远眺国会大厦，约 60 分钟'},
+    {id:'i3h',type:'food',name:'享用晚餐',time:'18:00',duration:60,note:''},
+    {id:'i3i',type:'hotel',name:'入住温泉酒店',time:'19:00',duration:0,note:'请自备泳衣'},
   ]},
-  { id:'d4', date:'Day 4 · 圣安德烈 · 布达佩斯', summary:'圣安德烈 · 中央大市场 · 圣伊什特万圣殿', open:false, items:[
-    {id:'i4a',type:'food',   name:'酒店早餐',                       time:'08:00',duration:30, note:''},
-    {id:'i4b',type:'transit',name:'前往圣安德烈小镇',               time:'10:00',duration:30, note:'路程 18 km'},
-    {id:'i4c',type:'sight',  name:'游览圣安德烈小镇',               time:'10:30',duration:90, note:'蔡依林《马德里不思议》MV 取景地'},
-    {id:'i4d',type:'food',   name:'午餐自理',                       time:'12:00',duration:60, note:''},
-    {id:'i4e',type:'transit',name:'前往中央大市场',                 time:'13:00',duration:40, note:'路程 25 km'},
-    {id:'i4f',type:'sight',  name:'中央大市场 Central Market Hall', time:'13:40',duration:60, note:'布达佩斯最大菜市场'},
-    {id:'i4g',type:'sight',  name:'圣伊什特万圣殿',                 time:'15:00',duration:180,note:'尖塔 96m，可登 364 级楼梯俯瞰全城'},
-    {id:'i4h',type:'food',   name:'晚餐',                           time:'18:30',duration:60, note:''},
-    {id:'i4i',type:'hotel',  name:'入住酒店',                       time:'19:30',duration:0,  note:''},
+  {id:'d4',date:'Day 4 · 圣安德烈 · 布达佩斯',summary:'圣安德烈 · 中央大市场 · 圣伊什特万圣殿',open:false,items:[
+    {id:'i4a',type:'food',name:'酒店早餐',time:'08:00',duration:30,note:''},
+    {id:'i4b',type:'transit',name:'前往圣安德烈小镇',time:'10:00',duration:30,note:'路程 18 km'},
+    {id:'i4c',type:'sight',name:'游览圣安德烈小镇',time:'10:30',duration:90,note:'蔡依林 MV 取景地'},
+    {id:'i4d',type:'food',name:'午餐自理',time:'12:00',duration:60,note:''},
+    {id:'i4e',type:'transit',name:'前往中央大市场',time:'13:00',duration:40,note:'路程 25 km'},
+    {id:'i4f',type:'sight',name:'中央大市场',time:'13:40',duration:60,note:'布达佩斯最大菜市场'},
+    {id:'i4g',type:'sight',name:'圣伊什特万圣殿',time:'15:00',duration:180,note:'尖塔 96m，可登 364 级楼梯俯瞰全城'},
+    {id:'i4h',type:'food',name:'晚餐',time:'18:30',duration:60,note:''},
+    {id:'i4i',type:'hotel',name:'入住酒店',time:'19:30',duration:0,note:''},
   ]},
-  { id:'d5', date:'Day 5 · 布拉迪斯拉发 · 布尔诺', summary:'斯洛伐克首都 · 布尔诺老城', open:false, items:[
-    {id:'i5a',type:'food',   name:'酒店早餐',          time:'08:00',duration:30, note:''},
-    {id:'i5b',type:'transit',name:'前往布拉迪斯拉发', time:'08:30',duration:180,note:'路程约 200 km'},
-    {id:'i5c',type:'food',   name:'午餐',              time:'11:30',duration:60, note:''},
-    {id:'i5d',type:'sight',  name:'布拉迪斯拉发老城', time:'12:30',duration:180,note:'圣马丁教堂、罗兰喷泉、米哈尔门、蓝色教堂'},
-    {id:'i5e',type:'transit',name:'前往布尔诺',        time:'15:30',duration:120,note:'路程 130 km'},
-    {id:'i5f',type:'sight',  name:'布尔诺自由活动',    time:'17:30',duration:60, note:'自由广场、圣保禄主座教堂'},
-    {id:'i5g',type:'food',   name:'晚餐',              time:'18:30',duration:60, note:''},
-    {id:'i5h',type:'hotel',  name:'入住酒店',          time:'19:30',duration:0,  note:''},
+  {id:'d5',date:'Day 5 · 布拉迪斯拉发 · 布尔诺',summary:'斯洛伐克首都 · 布尔诺老城',open:false,items:[
+    {id:'i5a',type:'food',name:'酒店早餐',time:'08:00',duration:30,note:''},
+    {id:'i5b',type:'transit',name:'前往布拉迪斯拉发',time:'08:30',duration:180,note:'路程约 200 km'},
+    {id:'i5c',type:'food',name:'午餐',time:'11:30',duration:60,note:''},
+    {id:'i5d',type:'sight',name:'布拉迪斯拉发老城',time:'12:30',duration:180,note:'圣马丁教堂、罗兰喷泉、米哈尔门、蓝色教堂'},
+    {id:'i5e',type:'transit',name:'前往布尔诺',time:'15:30',duration:120,note:'路程 130 km'},
+    {id:'i5f',type:'sight',name:'布尔诺自由活动',time:'17:30',duration:60,note:'自由广场、圣保禄主座教堂'},
+    {id:'i5g',type:'food',name:'晚餐',time:'18:30',duration:60,note:''},
+    {id:'i5h',type:'hotel',name:'入住酒店',time:'19:30',duration:0,note:''},
   ]},
-  { id:'d6', date:'Day 6 · 布尔诺 → 布拉格', summary:'布拉格城堡 · 查理大桥 · 老城广场天文钟', open:false, items:[
-    {id:'i6a',type:'food',   name:'酒店早餐',          time:'07:30',duration:30, note:''},
-    {id:'i6b',type:'transit',name:'前往布拉格',        time:'08:00',duration:210,note:'路程 330 km，约 3.5 小时'},
-    {id:'i6c',type:'food',   name:'抵达后午餐',        time:'11:30',duration:60, note:''},
-    {id:'i6d',type:'sight',  name:'布拉格城堡',        time:'12:30',duration:120,note:'含门票 + 耳机讲解；圣维特大教堂、旧皇宫、黄金巷'},
-    {id:'i6e',type:'sight',  name:'查理大桥',          time:'14:30',duration:60, note:'13 世纪石桥，桥上巴洛克雕像'},
-    {id:'i6f',type:'sight',  name:'老城广场 & 天文钟',time:'16:30',duration:120,note:'天文钟建于 1410 年，整点 12 圣像表演'},
-    {id:'i6g',type:'sight',  name:'跳舞的房子',        time:'19:00',duration:30, note:'解构主义地标，途经'},
-    {id:'i6h',type:'food',   name:'晚餐',              time:'19:30',duration:60, note:''},
-    {id:'i6i',type:'hotel',  name:'入住酒店',          time:'20:30',duration:0,  note:''},
+  {id:'d6',date:'Day 6 · 布尔诺 → 布拉格',summary:'布拉格城堡 · 查理大桥 · 老城广场天文钟',open:false,items:[
+    {id:'i6a',type:'food',name:'酒店早餐',time:'07:30',duration:30,note:''},
+    {id:'i6b',type:'transit',name:'前往布拉格',time:'08:00',duration:210,note:'路程 330 km，约 3.5 小时'},
+    {id:'i6c',type:'food',name:'抵达后午餐',time:'11:30',duration:60,note:''},
+    {id:'i6d',type:'sight',name:'布拉格城堡',time:'12:30',duration:120,note:'含门票 + 耳机讲解；圣维特大教堂、旧皇宫、黄金巷'},
+    {id:'i6e',type:'sight',name:'查理大桥',time:'14:30',duration:60,note:'13 世纪石桥，桥上巴洛克雕像'},
+    {id:'i6f',type:'sight',name:'老城广场 & 天文钟',time:'16:30',duration:120,note:'天文钟建于 1410 年，整点 12 圣像表演'},
+    {id:'i6g',type:'sub',name:'跳舞的房子',time:'19:00',duration:30,note:'解构主义地标，途经打卡'},
+    {id:'i6h',type:'food',name:'晚餐',time:'19:30',duration:60,note:''},
+    {id:'i6i',type:'hotel',name:'入住酒店',time:'20:30',duration:0,note:''},
   ]},
-  { id:'d7', date:'Day 7 · 布拉格 → CK 小镇 → 维也纳', summary:'克鲁姆洛夫世界双遗产小镇', open:false, items:[
-    {id:'i7a',type:'food',   name:'酒店早餐',      time:'07:30',duration:30, note:''},
-    {id:'i7b',type:'transit',name:'前往 CK 小镇', time:'08:00',duration:180,note:'路程 200 km'},
-    {id:'i7c',type:'food',   name:'午餐',          time:'11:00',duration:60, note:''},
-    {id:'i7d',type:'sight',  name:'游览 CK 小镇', time:'12:30',duration:240,note:'约 4 小时；1992 年世界文化和自然双重遗产；伏尔塔瓦河环抱'},
-    {id:'i7e',type:'transit',name:'前往维也纳',    time:'16:30',duration:180,note:'路程 200 km'},
-    {id:'i7f',type:'food',   name:'晚餐',          time:'19:30',duration:60, note:'酒店内享用'},
-    {id:'i7g',type:'hotel',  name:'入住酒店',      time:'20:30',duration:0,  note:''},
+  {id:'d7',date:'Day 7 · 布拉格 → CK 小镇 → 维也纳',summary:'克鲁姆洛夫世界双遗产小镇',open:false,items:[
+    {id:'i7a',type:'food',name:'酒店早餐',time:'07:30',duration:30,note:''},
+    {id:'i7b',type:'transit',name:'前往 CK 小镇',time:'08:00',duration:180,note:'路程 200 km'},
+    {id:'i7c',type:'food',name:'午餐',time:'11:00',duration:60,note:''},
+    {id:'i7d',type:'sight',name:'游览 CK 小镇',time:'12:30',duration:240,note:'约 4 小时；1992 年世界文化和自然双重遗产'},
+    {id:'i7e',type:'transit',name:'前往维也纳',time:'16:30',duration:180,note:'路程 200 km'},
+    {id:'i7f',type:'food',name:'晚餐',time:'19:30',duration:60,note:'酒店内享用'},
+    {id:'i7g',type:'hotel',name:'入住酒店',time:'20:30',duration:0,note:''},
   ]},
-  { id:'d8', date:'Day 8 · 维也纳', summary:'奥特莱斯 · 艺术史博物馆 · 克恩顿大街', open:false, items:[
-    {id:'i8a',type:'food',   name:'酒店早餐',              time:'08:00',duration:30, note:''},
-    {id:'i8b',type:'transit',name:'前往潘多夫奥特莱斯',   time:'08:30',duration:60, note:''},
-    {id:'i8c',type:'sight',  name:'潘多夫奥特莱斯购物',   time:'09:30',duration:240,note:'170+ 名品店 3-7 折，Armani/Gucci/Burberry 等'},
-    {id:'i8d',type:'food',   name:'午餐（自理）',          time:'12:00',duration:60, note:''},
-    {id:'i8e',type:'transit',name:'前往艺术史博物馆',      time:'13:30',duration:60, note:''},
-    {id:'i8f',type:'sight',  name:'维也纳艺术史博物馆',   time:'14:30',duration:90, note:'世界四大艺术博物馆，含拉斐尔《草地上的圣母》'},
-    {id:'i8g',type:'sight',  name:'克恩顿大街自由活动',   time:'16:00',duration:150,note:'维也纳最著名步行区，约 2.5 小时'},
-    {id:'i8h',type:'food',   name:'晚餐（自理）',          time:'18:00',duration:60, note:''},
-    {id:'i8i',type:'hotel',  name:'返回酒店',              time:'18:30',duration:0,  note:''},
+  {id:'d8',date:'Day 8 · 维也纳',summary:'奥特莱斯 · 艺术史博物馆 · 克恩顿大街',open:false,items:[
+    {id:'i8a',type:'food',name:'酒店早餐',time:'08:00',duration:30,note:''},
+    {id:'i8b',type:'transit',name:'前往潘多夫奥特莱斯',time:'08:30',duration:60,note:''},
+    {id:'i8c',type:'sight',name:'潘多夫奥特莱斯购物',time:'09:30',duration:240,note:'170+ 名品店 3-7 折'},
+    {id:'i8d',type:'food',name:'午餐（自理）',time:'12:00',duration:60,note:''},
+    {id:'i8e',type:'transit',name:'前往艺术史博物馆',time:'13:30',duration:60,note:''},
+    {id:'i8f',type:'sight',name:'维也纳艺术史博物馆',time:'14:30',duration:90,note:'世界四大艺术博物馆，含拉斐尔《草地上的圣母》'},
+    {id:'i8g',type:'sight',name:'克恩顿大街自由活动',time:'16:00',duration:150,note:'维也纳最著名步行区'},
+    {id:'i8h',type:'food',name:'晚餐（自理）',time:'18:00',duration:60,note:''},
+    {id:'i8i',type:'hotel',name:'返回酒店',time:'18:30',duration:0,note:''},
   ]},
-  { id:'d9', date:'Day 9 · 维也纳 → 深圳', summary:'HU790 11:05 起飞 · 飞行 10h55m', open:false, items:[
-    {id:'i9a',type:'food',   name:'酒店早餐',          time:'06:30',duration:30, note:'打包早餐，办理退费'},
-    {id:'i9b',type:'transit',name:'前往机场',          time:'06:50',duration:50, note:'路程 22 km，办理退税'},
-    {id:'i9c',type:'plane',  name:'HU790 维也纳-深圳',time:'11:05',duration:655,note:'飞行 10h55m，次日凌晨 04:00 抵达深圳'},
+  {id:'d9',date:'Day 9 · 维也纳 → 深圳',summary:'HU790 11:05 起飞 · 飞行 10h55m',open:false,items:[
+    {id:'i9a',type:'food',name:'酒店早餐',time:'06:30',duration:30,note:'打包早餐，办理退费'},
+    {id:'i9b',type:'transit',name:'前往机场',time:'06:50',duration:50,note:'路程 22 km，办理退税'},
+    {id:'i9c',type:'plane',name:'HU790 维也纳-深圳',time:'11:05',duration:655,note:'飞行 10h55m，次日凌晨 04:00 抵达'},
   ]},
-  { id:'d10',date:'Day 10 · 抵达深圳', summary:'凌晨 04:00 抵达 · 行程圆满结束', open:false, items:[
-    {id:'i10a',type:'plane', name:'抵达深圳', time:'04:00',duration:0,note:'满载欧洲精彩记忆，回到温馨的家 🏠'},
+  {id:'d10',date:'Day 10 · 抵达深圳',summary:'凌晨 04:00 抵达 · 行程圆满结束',open:false,items:[
+    {id:'i10a',type:'plane',name:'抵达深圳',time:'04:00',duration:0,note:'满载欧洲精彩记忆，回到温馨的家 🏠'},
   ]},
 ];
 
-// ── 状态 ───────────────────────────────────────────────────
-let tripId   = null;   // 数据库行 id
-let state    = null;   // { name, days }
-let isSaving = false;
-let saveQueue= false;
-let channel  = null;   // realtime channel
+// ── 状态 ──────────────────────────────────────────────────
+let tripId=null, state=null, billState=null, channel=null;
+let saveTimer=null, billSaveTimer=null;
+let editingId=null; // 当前正在编辑的行程项 id
 
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-function fmtMin(m) {
-  m = parseInt(m)||0;
-  if (!m) return '—';
-  if (m < 60) return m+'min';
-  const h=Math.floor(m/60), mm=m%60;
-  return mm ? `${h}h${mm}m` : `${h}h`;
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function fmtMin(m){m=parseInt(m)||0;if(!m)return'—';if(m<60)return m+'min';const h=Math.floor(m/60),mm=m%60;return mm?`${h}h${mm}m`:`${h}h`}
+function esc(s){return String(s||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}
+
+// ── Tab 切换 ───────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['trip','bill'][i]===tab));
+  document.getElementById('page-trip').classList.toggle('active',tab==='trip');
+  document.getElementById('page-bill').classList.toggle('active',tab==='bill');
+  if(tab==='bill'){renderBill()}
 }
 
-// ── 同步状态显示 ────────────────────────────────────────────
-function setSyncStatus(status, text) {
-  const dot  = document.getElementById('sync-dot');
-  const span = document.getElementById('sync-text');
-  dot.className = 'sync-dot ' + status;
-  span.textContent = text;
+// ── 同步状态 ───────────────────────────────────────────────
+function setSyncStatus(s,t){
+  document.getElementById('sync-dot').className='sync-dot '+s;
+  document.getElementById('sync-text').textContent=t;
 }
 
-// ── 初始化：找到或创建行程 ──────────────────────────────────
-async function init() {
-  try {
-    // 从 URL hash 读取 tripId（分享链接带的）
-    const hash = location.hash.slice(1);
-    let targetId = hash.startsWith('trip-') ? hash : null;
-
-    if (targetId) {
-      // 用分享链接打开，加载对应行程
-      const { data, error } = await sb.from('trips').select('*').eq('id', targetId).single();
-      if (data) {
-        tripId = data.id;
-        state  = { name: data.name, days: data.days };
-      } else {
-        targetId = null; // 找不到就新建
-      }
+// ── 初始化 ────────────────────────────────────────────────
+async function init(){
+  try{
+    const hash=location.hash.slice(1);
+    let targetId=hash.startsWith('trip-')?hash.replace('trip-',''):null;
+    if(targetId){
+      const{data}=await sb.from('trips').select('*').eq('id',targetId).single();
+      if(data){tripId=data.id;state={name:data.name,days:data.days};billState=data.bill||{members:[],expenses:[]}}
+      else targetId=null;
     }
-
-    if (!targetId) {
-      // 没有 tripId，查数据库里有没有已有行程
-      const { data } = await sb.from('trips').select('id, name, days').order('created_at', { ascending: true }).limit(1);
-      if (data && data.length > 0) {
-        tripId = data[0].id;
-        state  = { name: data[0].name, days: data[0].days };
+    if(!targetId){
+      const{data}=await sb.from('trips').select('*').order('created_at',{ascending:true}).limit(1);
+      if(data&&data.length>0){
+        tripId=data[0].id;state={name:data[0].name,days:data[0].days};
+        billState=data[0].bill||{members:[],expenses:[]};
       } else {
-        // 第一次：写入种子数据
-        const { data: inserted } = await sb.from('trips').insert({
-          name: '东欧 10 日游 · 深圳-维也纳-布达佩斯-布拉格-维也纳',
-          days: SEED_DAYS
+        const{data:ins}=await sb.from('trips').insert({
+          name:'东欧 10 日游 · 深圳-维也纳-布达佩斯-布拉格-维也纳',
+          days:SEED_DAYS,bill:{members:[],expenses:[]}
         }).select().single();
-        tripId = inserted.id;
-        state  = { name: inserted.name, days: inserted.days };
+        tripId=ins.id;state={name:ins.name,days:ins.days};billState={members:[],expenses:[]};
       }
     }
-
-    // 更新 URL hash，让当前链接就是分享链接
-    location.hash = 'trip-' + tripId;
-
-    // 订阅实时更新
+    location.hash='trip-'+tripId;
     subscribeRealtime();
-
-    // 渲染
     hideLoading();
     render();
-    setSyncStatus('live', '实时同步已连接');
-    updateCollabBar();
-
-  } catch(e) {
-    console.error(e);
-    setSyncStatus('error', '连接失败，请刷新');
-    hideLoading();
+    setSyncStatus('live','实时同步已连接');
+  }catch(e){
+    console.error(e);setSyncStatus('error','连接失败，请刷新');hideLoading();
   }
 }
 
-// ── Realtime 订阅 ───────────────────────────────────────────
-function subscribeRealtime() {
-  if (channel) channel.unsubscribe();
-  channel = sb
-    .channel('trip-' + tripId)
-    .on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'trips',
-      filter: `id=eq.${tripId}`
-    }, payload => {
-      // 收到别人的改动，如果本地没在输入就更新
-      if (!isSaving && !document.activeElement?.matches('input,select')) {
-        state = { name: payload.new.name, days: payload.new.days };
-        render();
-        showToast('行程已更新 ✨');
+function subscribeRealtime(){
+  if(channel)channel.unsubscribe();
+  channel=sb.channel('trip-'+tripId)
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'trips',filter:`id=eq.${tripId}`},payload=>{
+      if(!document.activeElement?.matches('input,select,textarea')){
+        state={name:payload.new.name,days:payload.new.days};
+        billState=payload.new.bill||{members:[],expenses:[]};
+        render();renderBill();showToast('行程已更新 ✨');
       }
     })
-    .subscribe(status => {
-      if (status === 'SUBSCRIBED') setSyncStatus('live', '实时同步已连接');
-      else if (status === 'CLOSED') setSyncStatus('error', '连接断开，请刷新');
+    .subscribe(s=>{
+      if(s==='SUBSCRIBED')setSyncStatus('live','实时同步已连接');
+      else if(s==='CLOSED')setSyncStatus('error','连接断开，请刷新');
     });
 }
 
-// ── 保存到 Supabase ─────────────────────────────────────────
-let saveTimer = null;
-function scheduleSave() {
+function scheduleSave(){
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(doSave, 800);
+  saveTimer=setTimeout(async()=>{
+    setSyncStatus('saving','保存中...');
+    try{
+      const days=state.days.map(d=>({id:d.id,date:d.date,summary:d.summary,open:d.open,items:d.items}));
+      await sb.from('trips').update({name:state.name,days,bill:billState,updated_at:new Date().toISOString()}).eq('id',tripId);
+      setSyncStatus('live','已保存 · 实时同步');
+    }catch(e){setSyncStatus('error','保存失败')}
+  },800);
 }
 
-async function doSave() {
-  if (!tripId) return;
-  isSaving = true;
-  setSyncStatus('saving', '保存中...');
-  try {
-    const days = state.days.map(d => ({
-      id: d.id, date: d.date, summary: d.summary,
-      open: d.open, items: d.items
-    }));
-    await sb.from('trips').update({
-      name: state.name,
-      days,
-      updated_at: new Date().toISOString()
-    }).eq('id', tripId);
-    setSyncStatus('live', '已保存 · 实时同步');
-  } catch(e) {
-    setSyncStatus('error', '保存失败，请重试');
-  } finally {
-    isSaving = false;
-  }
+// ── 渲染行程 ──────────────────────────────────────────────
+function render(){
+  const c=document.getElementById('days-container');
+  c.innerHTML=state.days.map((day,di)=>renderDay(day,di)).join('');
+  updateDaySelector();
 }
 
-// ── 协作者栏 ────────────────────────────────────────────────
-function updateCollabBar() {
-  document.getElementById('collab-text').textContent =
-    '把链接发给朋友，可以一起实时编辑这份行程';
-}
+function renderDay(day,di){
+  const sights=day.items.filter(i=>i.type==='sight').length;
+  const foods=day.items.filter(i=>i.type==='food').length;
+  const total=day.items.reduce((s,i)=>s+(parseInt(i.duration)||0),0);
 
-// ── 渲染 ───────────────────────────────────────────────────
-function render() {
-  document.getElementById('trip-title').textContent = state.name || '东欧 10 日游';
-  const container = document.getElementById('days-container');
-  container.innerHTML = state.days.map((day, di) => renderDay(day, di)).join('');
-}
-
-function renderDay(day, di) {
-  const sights = day.items.filter(i=>i.type==='sight').length;
-  const foods  = day.items.filter(i=>i.type==='food').length;
-  const total  = day.items.reduce((s,i)=>s+(parseInt(i.duration)||0),0);
-
-  const items = day.items.map((it, ii) => `
-    <div class="item-row">
-      <div class="item-icon ${ICON_CLASS[it.type]||'ic-sight'}">${ICONS[it.type]||'📍'}</div>
-      <div class="item-main">
-        <div class="item-name">
-          ${it.time ? `<span class="item-time-tag">${esc(it.time)}</span>` : ''}
-          ${esc(it.name)}
+  const items=day.items.map((it,ii)=>{
+    const isSub=it.type==='sub';
+    const isEditing=editingId===it.id;
+    if(isEditing) return renderEditForm(di,ii,it);
+    return `
+      <div class="item-row${isSub?' sub':''}" id="item-${it.id}">
+        <div class="item-icon ${ICON_CLASS[it.type]||'ic-sight'}">${ICONS[it.type]||'📍'}</div>
+        <div class="item-main">
+          <div class="item-name">
+            ${it.time?`<span class="item-time-tag">${esc(it.time)}</span>`:''}
+            ${esc(it.name)}
+          </div>
+          <div class="item-meta">
+            <span>⏱ ${fmtMin(it.duration)}</span>
+            ${it.type==='transit'?'<span class="tag tag-transit">路程</span>':''}
+            ${it.type==='plane'?'<span class="tag tag-plane">航班</span>':''}
+            ${it.type==='hotel'?'<span class="tag tag-hotel">住宿</span>':''}
+            ${isSub?'<span class="tag tag-sub">小景点</span>':''}
+          </div>
+          ${it.note?`<div class="item-note">${esc(it.note)}</div>`:''}
         </div>
-        <div class="item-meta">
-          <span>⏱ ${fmtMin(it.duration)}</span>
-          ${it.type==='transit'?'<span class="tag tag-transit">路程</span>':''}
-          ${it.type==='plane'  ?'<span class="tag tag-plane">航班</span>'  :''}
-          ${it.type==='hotel'  ?'<span class="tag tag-hotel">住宿</span>'  :''}
+        <div class="item-actions">
+          <button class="item-btn" onclick="startEdit('${it.id}')" title="编辑">✏️</button>
+          <button class="item-btn del" onclick="delItem(${di},${ii})" title="删除">×</button>
         </div>
-        ${it.note ? `<div class="item-note">${esc(it.note)}</div>` : ''}
-      </div>
-      <button class="item-del" onclick="delItem(${di},${ii})">×</button>
-    </div>
-  `).join('');
+      </div>`;
+  }).join('');
 
-  const formHtml = day._showForm ? `
-    <div class="add-form">
+  const showForm=day._showForm;
+  const formHtml=showForm?`
+    <div class="item-edit-form">
       <div class="form-grid">
-        <div class="form-field full">
-          <label class="form-label">类型</label>
-          <select id="ft-${di}">
-            ${TYPE_OPTS.map(o=>`<option value="${o.v}">${o.l}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-field full">
-          <label class="form-label">名称 *</label>
-          <input id="fn-${di}" placeholder="如：圣维特大教堂" />
-        </div>
-        <div class="form-field">
-          <label class="form-label">时间</label>
-          <input id="fti-${di}" placeholder="09:30" />
-        </div>
-        <div class="form-field">
-          <label class="form-label">时长（分钟）</label>
-          <input id="fd-${di}" type="number" placeholder="60" min="0" />
-        </div>
-        <div class="form-field full">
-          <label class="form-label">备注</label>
-          <input id="fno-${di}" placeholder="可选" />
-        </div>
+        <div class="form-field full"><label class="form-label">类型</label>
+          <select id="ft-${di}">${TYPE_OPTS.map(o=>`<option value="${o.v}">${o.l}</option>`).join('')}</select></div>
+        <div class="form-field full"><label class="form-label">名称 *</label>
+          <input id="fn-${di}" placeholder="如：圣维特大教堂" /></div>
+        <div class="form-field"><label class="form-label">时间</label>
+          <input id="fti-${di}" placeholder="09:30" /></div>
+        <div class="form-field"><label class="form-label">时长（分钟）</label>
+          <input id="fd-${di}" type="number" placeholder="60" min="0" /></div>
+        <div class="form-field full"><label class="form-label">备注</label>
+          <textarea id="fno-${di}" placeholder="可选"></textarea></div>
       </div>
       <div class="form-btns">
         <button class="btn-save-item" onclick="saveItem(${di})">✓ 保存</button>
         <button class="btn-cancel-item" onclick="cancelForm(${di})">取消</button>
       </div>
-    </div>
-  ` : `<button class="add-row" onclick="showForm(${di})">＋ 添加行程项</button>`;
+    </div>`
+  :`<button class="add-row" onclick="showForm(${di})">＋ 添加行程项</button>`;
 
   return `
     <div class="day-card ${day.open?'open':''}" id="day-${di}">
@@ -712,117 +531,249 @@ function renderDay(day, di) {
       </div>
       <div class="day-body">
         <div class="meta-edit">
-          <input value="${esc(day.date||'')}" placeholder="日期/地点"
-            onchange="updateMeta(${di},'date',this.value)" />
-          <input value="${esc(day.summary||'')}" placeholder="当日概览"
-            onchange="updateMeta(${di},'summary',this.value)" />
+          <input value="${esc(day.date||'')}" placeholder="日期/地点" onchange="updateMeta(${di},'date',this.value)" />
+          <input value="${esc(day.summary||'')}" placeholder="当日概览" onchange="updateMeta(${di},'summary',this.value)" />
         </div>
         ${items}
         ${formHtml}
         <button class="del-day-btn" onclick="delDay(${di})">🗑 删除这一天</button>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
-function esc(s) {
-  return String(s||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+function renderEditForm(di,ii,it){
+  return `
+    <div class="item-edit-form" id="edit-${it.id}">
+      <div class="form-grid">
+        <div class="form-field full"><label class="form-label">类型</label>
+          <select id="et-type-${it.id}">${TYPE_OPTS.map(o=>`<option value="${o.v}"${o.v===it.type?' selected':''}>${o.l}</option>`).join('')}</select></div>
+        <div class="form-field full"><label class="form-label">名称 *</label>
+          <input id="et-name-${it.id}" value="${esc(it.name)}" /></div>
+        <div class="form-field"><label class="form-label">时间</label>
+          <input id="et-time-${it.id}" value="${esc(it.time||'')}" placeholder="09:30" /></div>
+        <div class="form-field"><label class="form-label">时长（分钟）</label>
+          <input id="et-dur-${it.id}" type="number" value="${it.duration||0}" min="0" /></div>
+        <div class="form-field full"><label class="form-label">备注</label>
+          <textarea id="et-note-${it.id}" placeholder="可选">${esc(it.note||'')}</textarea></div>
+      </div>
+      <div class="form-btns">
+        <button class="btn-save-item" onclick="saveEdit(${di},${ii},'${it.id}')">✓ 保存修改</button>
+        <button class="btn-cancel-item" onclick="cancelEdit()">取消</button>
+      </div>
+    </div>`;
 }
 
-// ── 交互操作 ────────────────────────────────────────────────
-function toggleDay(di) {
-  state.days[di].open = !state.days[di].open;
-  render();
-  scheduleSave();
-  if (state.days[di].open)
+// ── 行程交互 ──────────────────────────────────────────────
+function toggleDay(di){
+  state.days[di].open=!state.days[di].open;
+  render();scheduleSave();
+  if(state.days[di].open)
     setTimeout(()=>document.getElementById('day-'+di)?.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
 }
+function updateMeta(di,field,val){state.days[di][field]=val;scheduleSave()}
 
-function updateMeta(di, field, val) {
-  state.days[di][field] = val;
-  scheduleSave();
+function startEdit(itemId){
+  editingId=itemId;render();
+  setTimeout(()=>document.getElementById('et-name-'+itemId)?.focus(),50);
 }
+function cancelEdit(){editingId=null;render()}
 
-function delItem(di, ii) {
-  if (!confirm(`删除「${state.days[di].items[ii].name}」？`)) return;
-  state.days[di].items.splice(ii,1);
-  render();
-  scheduleSave();
-}
-
-function showForm(di) {
-  state.days[di]._showForm = true;
-  render();
-  setTimeout(()=>document.getElementById('fn-'+di)?.focus(),50);
-}
-
-function cancelForm(di) {
-  state.days[di]._showForm = false;
-  render();
-}
-
-function saveItem(di) {
-  const name = document.getElementById('fn-'+di)?.value.trim();
-  if (!name) { showToast('请输入名称'); return; }
-  state.days[di].items.push({
-    id: uid(),
-    type: document.getElementById('ft-'+di)?.value || 'sight',
+function saveEdit(di,ii,itemId){
+  const name=document.getElementById('et-name-'+itemId)?.value.trim();
+  if(!name){showToast('名称不能为空');return}
+  state.days[di].items[ii]={
+    ...state.days[di].items[ii],
+    type:document.getElementById('et-type-'+itemId)?.value||'sight',
     name,
-    time:     document.getElementById('fti-'+di)?.value.trim()  || '',
-    duration: parseInt(document.getElementById('fd-'+di)?.value) || 0,
-    note:     document.getElementById('fno-'+di)?.value.trim()  || '',
-  });
-  state.days[di]._showForm = false;
-  render();
-  scheduleSave();
-  showToast('已添加 ✓');
+    time:document.getElementById('et-time-'+itemId)?.value.trim()||'',
+    duration:parseInt(document.getElementById('et-dur-'+itemId)?.value)||0,
+    note:document.getElementById('et-note-'+itemId)?.value.trim()||'',
+  };
+  editingId=null;render();scheduleSave();showToast('已保存 ✓');
 }
 
-function addDay() {
-  state.days.push({ id:uid(), date:`Day ${state.days.length+1}`, summary:'', open:true, items:[] });
-  render();
-  scheduleSave();
+function delItem(di,ii){
+  if(!confirm(`删除「${state.days[di].items[ii].name}」？`))return;
+  state.days[di].items.splice(ii,1);editingId=null;render();scheduleSave();
+}
+function showForm(di){state.days[di]._showForm=true;render();setTimeout(()=>document.getElementById('fn-'+di)?.focus(),50)}
+function cancelForm(di){state.days[di]._showForm=false;render()}
+function saveItem(di){
+  const name=document.getElementById('fn-'+di)?.value.trim();
+  if(!name){showToast('请输入名称');return}
+  state.days[di].items.push({
+    id:uid(),
+    type:document.getElementById('ft-'+di)?.value||'sight',
+    name,
+    time:document.getElementById('fti-'+di)?.value.trim()||'',
+    duration:parseInt(document.getElementById('fd-'+di)?.value)||0,
+    note:document.getElementById('fno-'+di)?.value.trim()||'',
+  });
+  state.days[di]._showForm=false;render();scheduleSave();showToast('已添加 ✓');
+}
+function addDay(){
+  state.days.push({id:uid(),date:`Day ${state.days.length+1}`,summary:'',open:true,items:[]});
+  render();scheduleSave();
   setTimeout(()=>document.getElementById('day-'+(state.days.length-1))?.scrollIntoView({behavior:'smooth'}),80);
 }
-
-function delDay(di) {
-  if (!confirm(`删除「${state.days[di].date}」整天？`)) return;
-  state.days.splice(di,1);
-  render();
-  scheduleSave();
+function delDay(di){
+  if(!confirm(`删除「${state.days[di].date}」整天？`))return;
+  state.days.splice(di,1);editingId=null;render();scheduleSave();
 }
 
-// ── 分享 ────────────────────────────────────────────────────
-function openShare() {
-  const url = location.origin + location.pathname + '#trip-' + tripId;
-  document.getElementById('share-url-text').textContent = url;
+// ── 账单 ──────────────────────────────────────────────────
+function renderBill(){
+  renderMembers();renderExpenses();renderSettle();
+  updatePayerSelect();updateDaySelector();
+}
+
+function renderMembers(){
+  const list=document.getElementById('member-list');
+  if(!billState.members.length){list.innerHTML='<span style="font-size:13px;color:var(--ink3)">还没有成员，先添加吧</span>';return}
+  list.innerHTML=billState.members.map((m,i)=>`
+    <div class="member-tag">
+      <span>${esc(m)}</span>
+      <span class="remove-member" onclick="removeMember(${i})">×</span>
+    </div>`).join('');
+}
+
+function addMember(){
+  const input=document.getElementById('new-member-input');
+  const name=input.value.trim();
+  if(!name){showToast('请输入名字');return}
+  if(billState.members.includes(name)){showToast('名字已存在');return}
+  if(billState.members.length>=10){showToast('最多 10 人');return}
+  billState.members.push(name);input.value='';
+  renderBill();scheduleSave();
+}
+function removeMember(i){
+  if(!confirm(`移除「${billState.members[i]}」？相关支出记录不会删除。`))return;
+  billState.members.splice(i,1);renderBill();scheduleSave();
+}
+
+function updatePayerSelect(){
+  const sel=document.getElementById('exp-payer');
+  if(!sel)return;
+  sel.innerHTML=billState.members.length
+    ?billState.members.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')
+    :'<option value="">先添加成员</option>';
+}
+function updateDaySelector(){
+  const sel=document.getElementById('exp-day');
+  if(!sel)return;
+  sel.innerHTML=`<option value="">不关联具体日期</option>`+
+    state.days.map((d,i)=>`<option value="${i}">${esc(d.date)}</option>`).join('');
+}
+
+function renderExpenses(){
+  const list=document.getElementById('expense-list');
+  if(!billState.expenses||!billState.expenses.length){
+    list.innerHTML='<div style="font-size:13px;color:var(--ink3);padding:10px 0">还没有支出记录</div>';
+    document.getElementById('total-amount').textContent='¥0.00';return;
+  }
+  const total=billState.expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  document.getElementById('total-amount').textContent='¥'+total.toFixed(2);
+  list.innerHTML=billState.expenses.map((e,i)=>`
+    <div class="expense-item">
+      <div class="expense-info">
+        <div class="expense-payer">${esc(e.payer)}</div>
+        <div class="expense-desc">${esc(e.desc)}${e.day!==undefined&&e.day!==''?` · ${esc(state.days[e.day]?.date||'')}`:''}</div>
+      </div>
+      <div class="expense-amount">¥${parseFloat(e.amount).toFixed(2)}</div>
+      <button class="expense-del" onclick="delExpense(${i})">×</button>
+    </div>`).join('');
+}
+
+function addExpense(){
+  const payer=document.getElementById('exp-payer')?.value;
+  const desc=document.getElementById('exp-desc')?.value.trim();
+  const day=document.getElementById('exp-day')?.value;
+  const amount=parseFloat(document.getElementById('exp-amount')?.value);
+  if(!payer){showToast('请先添加成员');return}
+  if(!desc){showToast('请输入项目描述');return}
+  if(!amount||amount<=0){showToast('请输入有效金额');return}
+  if(!billState.expenses)billState.expenses=[];
+  billState.expenses.push({id:uid(),payer,desc,day:day!==''?parseInt(day):'',amount});
+  document.getElementById('exp-desc').value='';
+  document.getElementById('exp-amount').value='';
+  renderBill();scheduleSave();showToast('已记录 ✓');
+}
+function delExpense(i){
+  if(!confirm('删除这条支出？'))return;
+  billState.expenses.splice(i,1);renderBill();scheduleSave();
+}
+
+function renderSettle(){
+  const el=document.getElementById('settle-result');
+  const members=billState.members;
+  const expenses=billState.expenses||[];
+  if(members.length<2){el.innerHTML='<div class="settle-empty">至少需要 2 位成员才能结算</div>';return}
+  if(!expenses.length){el.innerHTML='<div class="settle-empty">还没有支出记录</div>';return}
+
+  const total=expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  const perPerson=total/members.length;
+  const paid={};
+  members.forEach(m=>paid[m]=0);
+  expenses.forEach(e=>{if(paid[e.payer]!==undefined)paid[e.payer]+=(parseFloat(e.amount)||0)});
+
+  // 计算每人净额（正=多付，负=少付）
+  const balance={};
+  members.forEach(m=>balance[m]=paid[m]-perPerson);
+
+  // 贪心算法：最少转账次数结算
+  const settlements=[];
+  const debtors=members.filter(m=>balance[m]<-0.01).map(m=>({name:m,amt:-balance[m]}));
+  const creditors=members.filter(m=>balance[m]>0.01).map(m=>({name:m,amt:balance[m]}));
+  let i=0,j=0;
+  while(i<debtors.length&&j<creditors.length){
+    const amt=Math.min(debtors[i].amt,creditors[j].amt);
+    settlements.push({from:debtors[i].name,to:creditors[j].name,amt});
+    debtors[i].amt-=amt;creditors[j].amt-=amt;
+    if(debtors[i].amt<0.01)i++;
+    if(creditors[j].amt<0.01)j++;
+  }
+
+  if(!settlements.length){el.innerHTML='<div class="settle-empty">✅ 大家已经平账啦！</div>';return}
+  el.innerHTML=`
+    <div style="font-size:12px;color:var(--ink3);margin-bottom:12px">
+      人均 ¥${perPerson.toFixed(2)}，共 ${members.length} 人
+    </div>
+    <div class="settle-list">
+      ${settlements.map(s=>`
+        <div class="settle-item">
+          <span>${esc(s.from)}</span>
+          <span class="settle-arrow">→ 转给</span>
+          <span>${esc(s.to)}</span>
+          <span class="settle-amount">¥${s.amt.toFixed(2)}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── 分享 ──────────────────────────────────────────────────
+function openShare(){
+  document.getElementById('share-url-text').textContent=location.origin+location.pathname+'#trip-'+tripId;
   document.getElementById('share-modal').classList.add('show');
 }
-function closeShare() { document.getElementById('share-modal').classList.remove('show'); }
-function closeShareIfBg(e) { if (e.target===document.getElementById('share-modal')) closeShare(); }
-async function copyUrl() {
-  const url = document.getElementById('share-url-text').textContent;
-  try { await navigator.clipboard.writeText(url); }
-  catch { const t=document.createElement('textarea'); t.value=url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); }
-  showToast('链接已复制，发给朋友吧 🎉');
-  closeShare();
+function closeShare(){document.getElementById('share-modal').classList.remove('show')}
+function closeShareIfBg(e){if(e.target===document.getElementById('share-modal'))closeShare()}
+async function copyUrl(){
+  const url=document.getElementById('share-url-text').textContent;
+  try{await navigator.clipboard.writeText(url)}
+  catch{const t=document.createElement('textarea');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t)}
+  showToast('链接已复制，发给朋友吧 🎉');closeShare();
 }
 
-// ── Toast & Loading ──────────────────────────────────────────
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 2400);
+// ── Toast & Loading ───────────────────────────────────────
+function showToast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2400);
 }
-function hideLoading() {
-  const el = document.getElementById('loading');
-  el.classList.add('hide');
-  document.getElementById('app').style.display = 'block';
-  setTimeout(()=>el.remove(), 500);
+function hideLoading(){
+  const el=document.getElementById('loading');el.classList.add('hide');
+  document.getElementById('app').style.display='block';
+  setTimeout(()=>el.remove(),500);
 }
 
-// ── 启动 ────────────────────────────────────────────────────
 init();
 </script>
 </body>
